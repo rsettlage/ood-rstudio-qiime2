@@ -1,0 +1,154 @@
+## helpful read: https://divingintogeneticsandgenomics.rbind.io/post/run-rstudio-server-with-singularity-on-hpc/
+## combining the tidyverse and verse Dockerfiles, wanting to make sure I have the rstudio-r version
+
+FROM rocker/rstudio:3.6.1
+
+LABEL org.label-schema.license="GPL-2.0" \
+      org.label-schema.vcs-url="https://github.com/rsettlag" \
+      maintainer="Robert Settlage <rsettlag@vt.edu>"
+## helpful read: https://divingintogeneticsandgenomics.rbind.io/post/run-rstudio-server-with-singularity-on-hpc/
+
+ENV PATH=$PATH:/opt/TinyTeX/bin/x86_64-linux/:/root/miniconda3/bin
+
+RUN apt-get update -qq && apt-get -y --no-install-recommends install \
+  vim \
+  libxml2-dev \
+  libcairo2-dev \
+  libsqlite3-dev \
+  libmariadbd-dev \
+  libmariadb-client-lgpl-dev \
+  libpq-dev \
+  libssh2-1-dev \
+  mesa-common-dev \
+  libx11-dev \
+  xorg \
+  libglu1-mesa-dev \
+  unixodbc-dev \
+  libsasl2-dev \
+  libhdf5-dev \
+  libgsl-dev \
+  tcl-dev \
+  tk-dev \
+  tcl8.6-dev \
+  tk8.6-dev \
+  libfftw3-dev \
+  bwidget 
+RUN apt-get update -qq
+RUN install2.r --ncpus 6 --deps TRUE --skipinstalled -l /usr/local/lib/R/site-library rpanel
+RUN install2.r --ncpus 6 --deps TRUE --skipinstalled -l /usr/local/lib/R/site-library bigmemory readr
+RUN Rscript -e "install.packages(c('RcppAnnoy','RcppEigen', lib='/usr/local/lib/R/site-library'),depends=TRUE);install.packages('gtools'); library(gtools); inpkgs <- getDependencies(c('tidyverse','dplyr','devtools','formatR','remotes','selectr','caTools','ggpubr','data.table','BiocManager','lme4','VennDiagram','doParallel','gplots','ape','dendextend','flashClust','ggrepel','randomForest','parallelDist','pvclust','Rtsne','Seurat','vegan','VennDiagram','zoo','igraph','rlecuyer','tibble','Boruta','vegan','spatstat','gjam')); for(p in inpkgs){if(!is.installed(p)){install.packages(Ncpus=6, p, depends=FALSE, lib='/usr/local/lib/R/site-library')}}"
+#RUN install2.r --ncpus 6 --error \
+#    --deps TRUE \
+#    tidyverse \
+#    dplyr \
+#    devtools \
+#    formatR \
+#    remotes \
+#    selectr \
+#    caTools \
+#    ggpubr \
+#    data.table \
+#    BiocManager \
+#    lme4 \
+#    VennDiagram \
+#    doParallel \
+#    gplots \
+#    ape \
+#    dendextend \
+#    flashClust \
+#    ggrepel \
+#    randomForest \
+#    parallelDist \
+#    pvclust \
+#    Rtsne \
+#    Seurat \
+#    vegan \
+#    VennDiagram \
+#    zoo \
+#    igraph \
+#    rlecuyer \
+#    tibble \
+#    RcppEigen \
+#    Boruta \
+#    vegan \
+#    spatstat \
+#    gjam 
+#  && Rscript -e "instpkgs<-c('alsace','XCMS','phyloseq','seqinr','micropan','phanghorn','phytools','Biostrings','biobase','MLSeq','biomaRt','DESeq2','DT','edgeR','goseq','gplots','gtools','Heatplus','WGCNA'); BiocManager::install(instpkgs)" \
+RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
+  && dpkg -i texlive-local.deb \
+  && rm texlive-local.deb \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends \
+#    ## for rJava
+    default-jdk \
+#    ## Nice Google fonts
+    fonts-roboto \
+    ## used by some base R plots
+    ghostscript \
+    ## used to build rJava and other packages
+    libbz2-dev \
+    libicu-dev \
+    liblzma-dev \
+    ## system dependency of hunspell (devtools)
+    libhunspell-dev \
+    ## system dependency of hadley/pkgdown
+    libmagick++-dev \
+    ## rdf, for redland / linked data
+    librdf0-dev \
+    ## for V8-based javascript wrappers
+    libv8-dev \
+    ## R CMD Check wants qpdf to check pdf sizes, or throws a Warning
+    qpdf \
+    ## For building PDF manuals
+    texinfo \
+    ## for git via ssh key
+    ssh \
+ ## parallelization
+    libzmq3-dev \
+    libopenmpi-dev \
+ ## for gifski
+    cargo \
+ && apt-get clean \
+  && rm -rf /var/lib/apt/lists/ 
+  ## Use tinytex for LaTeX installation
+#  && install2.r --error tinytex \
+ ## Admin-based install of TinyTeX:
+#  && wget -qO- \
+#    "https://github.com/yihui/tinytex/raw/master/tools/install-unx.sh" | \
+#    sh -s - --admin --no-path \
+#  && mv ~/.TinyTeX /opt/TinyTeX \
+#  && /opt/TinyTeX/bin/*/tlmgr path add \
+#  && tlmgr install ae inconsolata listings metafont mfware parskip pdfcrop tex \
+#  && tlmgr path add \
+#  && Rscript -e "tinytex::r_texmf()" \
+#  && chown -R root:staff /opt/TinyTeX \
+#  && chown -R root:staff /usr/local/lib/R/site-library \
+#  && chmod -R g+w /opt/TinyTeX \
+#  && chmod -R g+wx /opt/TinyTeX/bin \
+RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron 
+  ## Currently (2017-06-06) need devel PKI for ssl issue: https://github.com/s-u/PKI/issues/19
+#  && install2.r --error PKI \
+  ## And some nice R packages for publishing-related stuff
+#  && install2.r --error --deps TRUE \
+#    bookdown \ 
+#    rticles \
+#    rmdshower \
+#    rJava \
+#    knitr \
+#    pkgmaker
+
+RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+  && wget -nv https://data.qiime2.org/distro/core/qiime2-2019.7-py36-linux-conda.yml \
+  && bash Miniconda3-latest-Linux-x86_64.sh -b \
+  && conda env create -n qiime2-2019.7 --file qiime2-2019.7-py36-linux-conda.yml
+
+RUN apt-get clean
+RUN sed -i '/^R_LIBS_USER=/d' /usr/local/lib/R/etc/Renviron
+RUN echo '\n \
+    # Configure http(s) proxy \
+    \n Sys.setenv(http_proxy="http://uaserve.cc.vt.edu:8080") \
+    \n Sys.setenv(https_proxy="http://uaserve.cc.vt.edu:8080") \
+    \n Sys.setenv(R_ENVIRON_USER="~/.Renviron.OOD") \
+    \n Sys.setenv(R_LIBS_USER="~/R/OOD/3.6.1") \
+    \n' >> /usr/local/lib/R/etc/Rprofile.site
+
