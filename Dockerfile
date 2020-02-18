@@ -43,6 +43,13 @@ RUN apt-get update -qq
 
 RUN apt-get clean
 
+RUN /opt/TinyTeX/bin/*/tlmgr path add \
+  && tlmgr install ae inconsolata listings metafont mfware parskip pdfcrop tex \
+  && tlmgr path add \
+  && tlmgr install url harvard tools amsmath float ctable multirow eurosym graphics comment setspace enumitem \
+  && tlmgr path add \
+  && Rscript -e "tinytex::r_texmf()"
+
 RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
 ##  && wget -nv https://data.qiime2.org/distro/core/qiime2-2019.10-py36-linux-conda.yml \
   && bash Miniconda3-latest-Linux-x86_64.sh -p /miniconda3 -b \
