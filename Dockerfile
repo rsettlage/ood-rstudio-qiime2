@@ -51,6 +51,11 @@ RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.
   && bash Miniconda3-latest-Linux-x86_64.sh -p /miniconda3 -b \
   && wget https://data.qiime2.org/distro/core/qiime2-2020.2-py36-linux-conda.yml \
   && conda env create -n qiime2-2020.2 --file qiime2-2020.2-py36-linux-conda.yml
+  
+RUN source activate qiime2-2020.2 \
+  && conda install -c bioconda itsxpress \
+  && pip install q2-itsxpress \
+  && qiime dev refresh-cache
 
 RUN cat /usr/local/lib/R/etc/Renviron \
   && cat /usr/local/lib/R/etc/Rprofile.site
