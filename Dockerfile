@@ -1,5 +1,4 @@
 ### note, check Qiime2 requirement file for conda env, match R version here
-
 FROM rocker/geospatial:3.5.1
 
 LABEL org.label-schema.license="GPL-2.0" \
@@ -9,6 +8,8 @@ LABEL org.label-schema.license="GPL-2.0" \
 
 ENV PATH="${PATH}:/opt/TinyTeX/bin/x86_64-linux:/miniconda3/bin"
 ENV DEBIAN_FRONTEND=noninteractive
+ENV VIRTUAL_ENV=/miniconda3/envs/qiime2-2020.6
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN apt-get update -qq && apt-get -y --no-install-recommends install \
   vim \
@@ -49,13 +50,12 @@ RUN Rscript -e ".libPaths('/usr/local/lib/R/site-library');BiocManager::install(
 
 RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
   && bash Miniconda3-latest-Linux-x86_64.sh -p /miniconda3 -b \
-  && wget https://data.qiime2.org/distro/core/qiime2-2020.2-py36-linux-conda.yml \
-  && conda env create -n qiime2-2020.2 --file qiime2-2020.2-py36-linux-conda.yml
-  
-# RUN conda activate qiime2-2020.2 \
-#  && conda install -c bioconda itsxpress \
-#  && pip install q2-itsxpress \
-#  && qiime dev refresh-cache
+  && wget https://data.qiime2.org/distro/core/qiime2-2020.6-py36-linux-conda.yml \
+  && conda env create -n qiime2-2020.6 --file qiime2-2020.6-py36-linux-conda.yml
+
+RUN conda install -n qiime2-2020.6 -c bioconda itsxpress
+RUN pip install q2-itsxpress
+##  && qiime dev refresh-cache
 
 RUN cat /usr/local/lib/R/etc/Renviron \
   && cat /usr/local/lib/R/etc/Rprofile.site
