@@ -1,5 +1,7 @@
 ### note, check Qiime2 requirement file for conda env, match R version here
-FROM rocker/geospatial:3.5.1
+##FROM rocker/geospatial:3.5.1
+### quick try at using my new geo
+FROM ood-rstudio-geo:4.1.1
 
 LABEL org.label-schema.license="GPL-2.0" \
       org.label-schema.vcs-url="https://github.com/rsettlag" \
@@ -8,7 +10,7 @@ LABEL org.label-schema.license="GPL-2.0" \
 
 ENV PATH="${PATH}:/opt/TinyTeX/bin/x86_64-linux:/miniconda3/bin"
 ENV DEBIAN_FRONTEND=noninteractive
-ENV VIRTUAL_ENV=/miniconda3/envs/qiime2-2020.6
+ENV VIRTUAL_ENV=/miniconda3/envs/qiime2-2021.8
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN apt-get update -qq && apt-get -y --no-install-recommends install \
@@ -50,8 +52,9 @@ RUN Rscript -e ".libPaths('/usr/local/lib/R/site-library');BiocManager::install(
 
 RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
   && bash Miniconda3-latest-Linux-x86_64.sh -p /miniconda3 -b \
-  && wget https://data.qiime2.org/distro/core/qiime2-2020.6-py36-linux-conda.yml \
-  && conda env create -n qiime2-2020.6 --file qiime2-2020.6-py36-linux-conda.yml
+  && wget https://data.qiime2.org/distro/core/qiime2-2021.8-py38-linux-conda.yml \
+  && conda env create -n qiime2-2021.8 --file qiime2-2021.8-py38-linux-conda.yml \
+  && rm qiime2-2021.8-py38-linux-conda.yml
 
 RUN conda install -n qiime2-2020.6 -c bioconda itsxpress bbmap==38.69
 RUN pip install q2-itsxpress
