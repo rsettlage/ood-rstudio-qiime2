@@ -56,7 +56,7 @@ RUN wget -nv https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.
   && conda env create -n qiime2-2021.8 --file qiime2-2021.8-py38-linux-conda.yml \
   && rm qiime2-2021.8-py38-linux-conda.yml
 
-RUN conda install -n qiime2-2020.6 -c bioconda itsxpress bbmap==38.69
+RUN conda install -n qiime2-2021.8 -c bioconda itsxpress bbmap==38.69
 RUN pip install q2-itsxpress
 ##  && qiime dev refresh-cache
 
