@@ -1,7 +1,7 @@
 ### note, check Qiime2 requirement file for conda env, match R version here
 ##FROM rocker/geospatial:3.5.1
 ### quick try at using my new geo
-FROM ood-rstudio-geo:4.1.1
+FROM ood-rstudio-geo:4.1.2
 
 LABEL org.label-schema.license="GPL-2.0" \
       org.label-schema.vcs-url="https://github.com/rsettlag" \
